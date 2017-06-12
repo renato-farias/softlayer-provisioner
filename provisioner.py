@@ -123,8 +123,8 @@ def _get_network_length(gb):
 
 def _get_billing_suffix():
     if config['billing'] == 'monthly':
-        return 'n'
-    return 's'
+        return 'm'
+    return 'h'
 
 
 def _get_vsi_name():
