@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+import re
 from requests import post
 from optparse import OptionParser
 from SoftLayer import VSManager, Client
@@ -25,6 +26,8 @@ parser.add_option("-l", "--local-only", dest="local_only", default=False)
 
 sl_user   = 'YOUR_SOFTLAYER_USER'
 sl_apikey = 'YOUR_SOFTLAYER_AKEY'
+
+image_regex = r'[a-zA-Z0-9]{8}(-[a-zA-Z0-9]{4}){3}-[a-zA-Z0-9]{12}'
 
 client = Client(username=sl_user,api_key=sl_apikey)
 vs = VSManager(client)
@@ -168,6 +171,8 @@ for _i in range(0, config['quantity']):
 
     if isinstance(images[config['image']], int):
         new_vsi['image_id'] = images[config['image']]
+    elif bool(re.match(image_regex, images[config['image']])):
+        new_vsi['image_id'] = images[config['image']]
     elif isinstance(images[config['image']], str):
         new_vsi['os_code'] = images[config['image']]
     else:
@@ -205,7 +210,8 @@ for _i in range(0, config['quantity']):
         for d in config['disk_advanced'].split(','):
             _all_disks.append(d)
 
-    new_vsi['disks'] = _all_disks
+    if 'os_code' in new_vsi.keys():
+        new_vsi['disks'] = _all_disks
 
 
     if config['local_only'] == True:
